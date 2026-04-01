@@ -55,22 +55,42 @@ async function getRoom(req, res) {
 
 
 async function joinroom(req, res) {
-    const roomId = req.query.roomid;
-    const userId = req.userid;
-    const user = await User.find(userId);
-    if (!user) {
-        return res.status(401).json({ msg: "user doesn't exist" });
+    try {
+        const roomId = req.query.roomid;
+        const userId = req.userid;
+        const user = await User.findById(userId);
+        // console.log(user);
+        if (!user) {
+            return res.status(401).json({ msg: "user doesn't exist" });
+        }
+        const room = await Room.findOne({ roomId });
+        // console.log(room);
+        // console.log(room.status);
+        if (!room) {
+            return res.status(401).json({ msg: "room doesn't exist" });
+        }
+        if (room.status !== 'waiting') {
+            return res.status(400).json({ msg: "game has started!" });
+        }
+        if (room.players.length == room.maxPlayers) {
+            return res.status(400).json({ msg: "room is full" });
+        }
+        if (room.players.includes(userId)) {
+            return res.status(400).json({ msg: "You are already in this room" });
+        }
+        room.players.push({
+            userId: req.userid,
+            username: user.username,
+            socketId: 'xx',
+            isHost: false
+        });
+        await room.save();
+        return res.status(200).send({ room });
     }
-    const room = await Room.find(roomid);
-    if (!room) {
-        return res.status(401).json({ msg: "room doesn't exist" });
+    catch (err) {
+        console.log(err.message);
     }
-    if (room.status != 'waiting') {
-        return res.status(401).json({ msg: "game has started!" });
-    }
-    if (room.players.length == room.maxPlayer) {
-        return res.status(402).json({ msg: "room is full" });
-    }
+
 }
 
 module.exports = { createroom, joinroom, getRooms, getRoom, joinroom }

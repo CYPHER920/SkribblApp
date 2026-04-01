@@ -5,7 +5,7 @@ const { validateUser, validateRoom } = require('../middleware/validate.middlewar
 const { signinSchema, signupSchema } = require('../validators/auth.validators') // schema User
 const tokenverify = require('../middleware/token.middleware') // for verifying token
 //--------------------------------------ROOM------------------------------------//
-const { createroom, joinroom, getRooms, getRoom, joinroom } = require('../controllers/room.controller'); //  room routes
+const { createroom, getRooms, getRoom, joinroom } = require('../controllers/room.controller'); //  room routes
 const roomCreateSchema = require('../validators/room.validators') // room zod schema
 
 ///////////////////-----------------------Routes------------------////////////////////
@@ -13,7 +13,6 @@ const roomCreateSchema = require('../validators/room.validators') // room zod sc
 router.post('/signup', validateUser(signupSchema), signup);
 router.post('/signin', validateUser(signinSchema), tokenverify, signin);
 router.post('/createroom', tokenverify, validateRoom(roomCreateSchema), createroom);
-router.post('/joinroom', joinroom);
 router.get('/getrooms', tokenverify, getRooms);
 router.get('/getroom', tokenverify, getRoom);
 router.post('/joinroom', tokenverify, joinroom);
