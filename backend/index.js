@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-connectDb();
+// connectDb();
 /// routes
 const routes = require('./routes/auth.routes');
 
@@ -26,7 +26,9 @@ const io = new Server(httpServer, {
         methods: ['GET', 'POST']
     }
 });
-require('./socket/gameEvents')(io);
+// require('./socket/gameEvents')(io);
+const GameEvents = require('./socket/gameEvents');
+GameEvents(io);/// passing io 
 const PORT = process.env.PORT || 4000;
 httpServer.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
