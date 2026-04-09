@@ -23,14 +23,19 @@ async function signup(req, res) {
     const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = await User.create({ username, password: hashedPassword, email });
 
-    const token = jwt.sign({ id: newUser._id }, jwtpassword);
+    const token = "Bearer " + jwt.sign({ id: newUser._id }, jwtpassword);
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax'
+    })
+
     return res.status(200).send({
         msg: "user saved successfully",
         user: {
             id: newUser._id,
             username: newUser.username,
             email: newUser.email,
-            token
         }
     });
 
@@ -52,6 +57,13 @@ async function signin(req, res) {
     if (!compare) {
         return res.status(401).send({ msg: "Wrong password" });
     }
+    const token = "Bearer " + jwt.sign({ id: existuser._id }, jwtpassword);
+    // console.log(token);
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax'
+    })
     return res.status(200).send({ msg: "Successfully login" })
 }
 module.exports = { signup, signin };

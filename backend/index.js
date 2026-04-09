@@ -5,12 +5,20 @@ const connectDb = require('./db')
 const cors = require('cors')
 const http = require('http');
 const { Server } = require('socket.io')
-// middleware section
+const cookieParser = require('cookie-parser');
 const app = express();
-app.use(cors());
+// middleware section
+
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
 app.use(express.json());
 
-// connectDb();
+app.use(cookieParser()); // for cookie parsing
+
+connectDb(); // connecting DB
+
 /// routes
 const routes = require('./routes/auth.routes');
 

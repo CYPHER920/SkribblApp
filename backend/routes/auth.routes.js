@@ -11,7 +11,7 @@ const roomCreateSchema = require('../validators/room.validators') // room zod sc
 ///////////////////-----------------------Routes------------------////////////////////
 
 router.post('/signup', validateUser(signupSchema), signup);
-router.post('/signin', validateUser(signinSchema), tokenverify, signin);
+router.post('/signin', validateUser(signinSchema), signin);
 router.post('/createroom', tokenverify, validateRoom(roomCreateSchema), createroom);
 router.get('/getrooms', tokenverify, getRooms);
 router.get('/getroom', tokenverify, getRoom);
