@@ -3,6 +3,9 @@ import Home from './pages/Home'
 import Signup from "./pages/Signup"
 import Signin from './pages/Signin'
 import DashBoard from './pages/DashBoard';
+import Profile from './pages/Profile'
+import Room from './pages/Room'
+
 function App() {
   
   // useEffect(()=>{
@@ -21,6 +24,8 @@ function App() {
       <Route path="/signup" element={<Signup/>} />
       <Route path="/signin" element={<Signin/>} />
       <Route path='/dashboard' element={<DashBoard/>}/>
+      <Route path='/profile' element={<Profile/>}/>
+      <Route path='/room:id' element={<Room/>}/>
       </Routes>
     </BrowserRouter>
   )

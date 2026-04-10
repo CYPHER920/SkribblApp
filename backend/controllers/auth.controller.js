@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User')
 const jwt = require('jsonwebtoken');
 const jwtpassword = process.env.password
+/*{Sing Up logic}*/
+
 async function signup(req, res) {
 
     const { username, password, email } = req.body;
@@ -42,7 +44,7 @@ async function signup(req, res) {
 
 }
 
-
+/*{Sing In logic}*/
 async function signin(req, res) {
     const { email, password } = req.body;
 
@@ -66,4 +68,33 @@ async function signin(req, res) {
     })
     return res.status(200).send({ msg: "Successfully login" })
 }
-module.exports = { signup, signin };
+
+/*{Log Out Logic} */
+const logout = (req, res) => {
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        path: '/'
+    });
+    return res.status(200).send("Logged Out successfully");
+}
+
+
+/*{Me logic} */
+
+const UserInfo = async (req, res) => {
+
+    const userId = req.userid
+    const user = await User.findOne({ _id: userId });
+    if (!user) {
+        return res.status(401).send("User doesn't exist");
+    }
+    return res.status(200).send({
+        username: user.username,
+        "msg": "successfully send username of user"
+    });
+}
+
+
+module.exports = { signup, signin, logout, UserInfo };
