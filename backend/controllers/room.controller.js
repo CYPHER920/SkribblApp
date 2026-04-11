@@ -20,7 +20,8 @@ async function createroom(req, res) {
     })
     res.status(200).json({
         message: 'Room created successfully',
-        roomId: room.roomId
+        roomId: room.roomId,
+        success: true
     });
 }
 
@@ -56,13 +57,15 @@ async function getRoom(req, res) {
 
 async function joinroom(req, res) {
     try {
-        const roomId = req.query.roomid;
+        const roomId = req.body.roomid;
+        // console.log(roomId);
         const userId = req.userid;
         const user = await User.findById(userId);
         // console.log(user);
         if (!user) {
             return res.status(401).json({ msg: "user doesn't exist" });
         }
+        // console.log(roomId);
         const room = await Room.findOne({ roomId });
         // console.log(room);
         // console.log(room.status);
@@ -85,7 +88,7 @@ async function joinroom(req, res) {
             isHost: false
         });
         await room.save();
-        return res.status(200).send({ room });
+        return res.status(200).send({ room, success: true });
     }
     catch (err) {
         console.log(err.message);

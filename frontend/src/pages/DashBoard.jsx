@@ -6,105 +6,125 @@ import axios from 'axios';
 const DashBoard = () => {
   const [loading, setLoading] = useState(false);
   const [roomcode, setRoomcode] = useState('');
-  const [players,setPlayers]=useState('');
-  const [rounds,setRounds]=useState('');
+  const [players, setPlayers] = useState('');
+  const [rounds, setRounds] = useState('');
   const navigate = useNavigate();
 
   const joinHandler = async () => {
-    // 1. Create a local trimmed version to avoid mutating state
-    const cleanRoomCode = roomcode.trim();
-
-    if (!cleanRoomCode) {
-      return alert("Please enter a room code!");
-    }
-
+    const roomid = roomcode.trim();
+    if (!roomid) return alert("Please enter a room code!");
     try {
       setLoading(true);
-      
-      // 2. Send the request with the clean code
-      const response = await axios.post(
-        'http://localhost:4000/api/v1/joinroom',
-        { roomcode: cleanRoomCode },
-        { withCredentials: true }
-      );
-
-      if (response.data.success) {
-        // 3. Navigate to the dynamic room route
-        navigate(`/room/${cleanRoomCode}`);
-      }
+      const response = await axios.post('http://localhost:4000/api/v1/joinroom', { roomid }, { withCredentials: true });
+      if (response.data.success) navigate(`/room/${roomid}`);
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Invalid Room Code! Please try again.");
+      alert(err.response?.data?.message || "Invalid Room Code!");
     } finally {
       setLoading(false);
     }
   };
 
-  const createHandler = () => {
-    navigate('/createroom');
+  const createHandler = async () => {
+    if (!rounds.trim() || !players.trim()) return alert("Please Enter Rounds and Players");
+    if (parseInt(rounds) > 4 || parseInt(players) > 5) return alert("Max Rounds: 4, Max Players: 5");
+
+    try {
+      setLoading(true);
+      const response = await axios.post('http://localhost:4000/api/v1/createroom', { rounds, players }, { withCredentials: true });
+      if (response.data.success) navigate(`/room/${response.data.roomId}`);
+    } catch (err) {
+      alert("Failed to create room.");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // Optimized styles for a tight, cohesive look
+  const cardClass = "bg-white/95 backdrop-blur-md p-6 rounded-[1.8rem] shadow-2xl border border-white/20 flex flex-col items-center text-center transition-all hover:scale-[1.02] w-full max-w-[340px] min-h-[370px] justify-between";
+  const labelClass = "text-[9px] font-black uppercase ml-1 mb-1 tracking-widest block text-left opacity-70";
+  const inputBase = "w-full rounded-xl border-2 outline-none transition-all font-bold text-sm shadow-sm";
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-6">
+    <div className="h-screen w-full overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-4 md:px-8 flex flex-col">
       <NavBar />
 
-      <main className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+      {/* Reduced gap from gap-8 to gap-4 */}
+      <main className="flex-1 flex flex-col lg:flex-row gap-4 items-center justify-center">
         
         {/* Join Room Card */}
-        <div className="bg-white/95 backdrop-blur-sm p-10 rounded-3xl shadow-2xl border border-white/10 flex flex-col items-center text-center transition-transform hover:scale-[1.03] group">
-          <div className="text-5xl mb-4 group-hover:animate-bounce">🎮</div>
-          <h2 className="text-2xl font-black text-indigo-600 mb-2 uppercase italic">Join Room</h2>
-          <p className="text-gray-500 mb-6 font-medium text-sm">Have a code? Jump into a friend's game!</p>
-          
-          {/* Styled Input */}
-          <input 
-            type="text" 
-            value={roomcode}
-            onChange={(e) => setRoomcode(e.target.value)} 
-            placeholder='ENTER CODE' 
-            className="w-full mb-4 p-4 rounded-2xl border-2 border-indigo-50 bg-indigo-50/50 text-center font-black text-indigo-600 placeholder:text-indigo-300 outline-none focus:border-indigo-500 focus:bg-white transition-all tracking-widest uppercase"
-            required 
-          />
+        <div className={cardClass}>
+          <div className="w-full">
+            <div className="text-4xl mb-3">🎮</div>
+            <h2 className="text-xl font-black text-indigo-600 uppercase italic leading-none mb-1.5">Join Room</h2>
+            <p className="text-gray-400 mb-6 text-[11px] font-semibold tracking-tight">Enter a code to join friends</p>
+            
+            <div className="w-full text-left">
+              <label className={`${labelClass} text-indigo-500`}>Room Code</label>
+              <input 
+                type="text" 
+                value={roomcode}
+                onChange={(e) => setRoomcode(e.target.value)} 
+                placeholder='Enter Room ID' 
+                className={`${inputBase} p-3 border-indigo-50 bg-indigo-50/50 text-indigo-600 focus:border-indigo-500 focus:bg-white tracking-widest uppercase placeholder:text-indigo-200`}
+              />
+            </div>
+          </div>
 
           <button 
             disabled={loading} 
             onClick={joinHandler} 
-            className="cursor-pointer w-full py-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white font-bold rounded-2xl shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2"
+            className="cursor-pointer w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white font-black rounded-xl shadow-lg shadow-indigo-500/30 transition-all uppercase tracking-widest mt-4 text-xs"
           >
-            {loading ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                Checking...
-              </>
-            ) : "Join Room"}
+            {loading ? "Checking..." : "Join Game"}
           </button>
         </div>
 
         {/* Create Room Card */}
-        <div className="bg-white/95 backdrop-blur-sm p-10 rounded-3xl shadow-2xl border border-white/10 flex flex-col items-center text-center transition-transform hover:scale-[1.03] group">
-          <div className="text-5xl mb-4 group-hover:rotate-12 transition-transform">🎨</div>
-          <h2 className="text-2xl font-black text-pink-500 mb-2 uppercase italic">Create Room</h2>
-          <p className="text-gray-500 mb-6 font-medium text-sm">Host your own lobby and invite others.</p>
-          
-          {/* Spacer to keep buttons aligned since the other card has an input */}
-          <div className="h-[68px] invisible md:block hidden"></div>
-            <label htmlFor="">No of player</label> <input onChange={(e)=>setPlayers(e.target.value)} value={players} required type="text" placeholder='enter the no of players' />
-            <label htmlFor=""> no of rounds </label> <input onChange={(e)=>setRounds(e.target.value)} value={rounds}  required type="text"  placeholder='enter no of rounds' />
+        <div className={cardClass}>
+          <div className="w-full">
+            <div className="text-4xl mb-3">🎨</div>
+            <h2 className="text-xl font-black text-pink-500 uppercase italic leading-none mb-1.5">Create Room</h2>
+            <p className="text-gray-400 mb-6 text-[11px] font-semibold tracking-tight">Customize your lobby settings</p>
+            
+            <div className="w-full grid grid-cols-2 gap-3">
+              <div className="text-left">
+                <label className={`${labelClass} text-pink-500`}>Players</label>
+                <input 
+                  onChange={(e)=>setPlayers(e.target.value)} 
+                  value={players} 
+                  type="text" 
+                  placeholder='4' 
+                  className={`${inputBase} p-3 border-pink-50 bg-pink-50/50 text-pink-600 focus:border-pink-500 placeholder:text-pink-200`} 
+                />
+              </div>
+              <div className="text-left">
+                <label className={`${labelClass} text-pink-500`}>Rounds</label>
+                <input 
+                  onChange={(e)=>setRounds(e.target.value)} 
+                  value={rounds} 
+                  type="text" 
+                  placeholder='3' 
+                  className={`${inputBase} p-3 border-pink-50 bg-pink-50/50 text-pink-600 focus:border-pink-500 placeholder:text-pink-200`} 
+                />
+              </div>
+            </div>
+          </div>
+
           <button 
             onClick={createHandler} 
-            className="cursor-pointer w-full py-4 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-2xl shadow-lg shadow-pink-200 transition-all"
+            disabled={loading}
+            className="cursor-pointer w-full py-3.5 bg-pink-500 hover:bg-pink-600 disabled:bg-pink-300 text-white font-black rounded-xl shadow-lg shadow-pink-500/30 transition-all uppercase tracking-widest mt-4 text-xs"
           >
-            Create Room
+            {loading ? "Creating..." : "Create Game"}
           </button>
         </div>
 
       </main>
 
-      {/* Footer Info */}
-      <div className="mt-12 text-center">
-        <span className="px-4 py-2 bg-black/20 backdrop-blur-md rounded-full text-white/90 text-[10px] font-black uppercase tracking-[0.2em] border border-white/10 shadow-xl">
-          <span className="text-green-400 mr-2 inline-block animate-pulse">●</span> 
-          1,240 players online
+      <div className="py-4 text-center">
+        <span className="px-5 py-2.5 bg-black/20 backdrop-blur-md rounded-full text-white/90 text-[9px] font-black uppercase tracking-[0.2em] border border-white/10 shadow-2xl inline-block">
+          <span className="text-green-400 mr-2 animate-pulse">●</span> 
+          1,240 players active
         </span>
       </div>
     </div>
