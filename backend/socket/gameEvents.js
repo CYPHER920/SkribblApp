@@ -9,30 +9,56 @@ module.exports = (io) => {
 
         /// --------------------Join Room------------------------------------------///
         socket.on('join-room', async ({ username, roomid }) => {
-            console.log(`username : ${username} room id :${roomid}`)
-            // 1. add this socket to the room group
+
             socket.join(roomid);
             socket.broadcast.to(roomid).emit('user-connected', { username });
-            // // 2. remember which room and user this socket belongs to
-            // socket.roomId = roomId;
-            // socket.userId = userId;
-            // // 3. find the room in MongoDB
-            // const room = await Room.findOne({ roomId });
-            // if (!room) {
-            //     socket.emit('error', { message: "Room doesn't exist" });
-            //     return;
-            // }
-            // // 4. update this player's socketId in MongoDB
-            // const player = room.players.find(
-            //     (p) => p.userId.toString() === userId.toString()
-            // );
 
-            // if (player) {
-            //     player.socketId = socket.id;
-            //     await room.save();
-            // }
-            // io.to(roomId).emit('room-update', room);
         });
+
+        /// --------------------Player Ready---------------------------------------///
+        socket.on('player-ready', async ({ roomid, username, isReady }) => {
+            console.log(`[player-ready] Received from ${username} for room ${roomid}. State: ${isReady}`);
+            try {
+                const room = await Room.findOne({ roomId: roomid });
+                console.log(`[player-ready] Room found:`, !!room);
+                if (room) {
+                    const player = room.players.find(p => p.username === username);
+                    console.log(`[player-ready] Player found inside room:`, !!player);
+                    if (player) {
+                        player.isReady = isReady;
+                        // Mark modified explicitly just in case Mongoose subdocument tracking is failing
+                        room.markModified('players');
+                        await room.save();
+                        console.log(`[player-ready] Saved to DB. Broadcasting player-ready-changed...`);
+                        socket.broadcast.to(roomid).emit('player-ready-changed', { username, isReady });
+                    }
+                }
+            } catch (e) {
+                console.error("[player-ready] Error:", e);
+            }
+        });
+
+        //////////////////// Leave - Room ///////////////////
+        socket.on('Leave-room', async ({ username, id }) => {
+            const room = await Room.findOne({ roomId: id });
+            if (!room) {
+                console.error("Room doesn't exist!");
+                return;
+            }
+            const players = room.players.filter((p) => {
+                if (p.username !== username) {
+                    return true;
+                }
+            });
+            room.players = players;
+            await room.save();
+
+            socket.leave(id); // Leave the socket room
+            if (players.length == 0) {
+                await Room.deleteOne({ roomId: id });
+            }
+            socket.broadcast.to(id).emit('player-left', { players });
+        })
     });
 
 }

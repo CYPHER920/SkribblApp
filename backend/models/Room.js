@@ -6,7 +6,8 @@ const PlayerSchema = new mongoose.Schema({
     username: { type: String, required: true },
     socketId: { type: String, required: true },
     isHost: { type: Boolean, default: false },
-    hasGuessed: { type: Boolean, default: false }
+    hasGuessed: { type: Boolean, default: false },
+    isReady: { type: Boolean, default: false }
 });
 
 const RoomSchema = new mongoose.Schema({

@@ -67,8 +67,7 @@ async function joinroom(req, res) {
         }
         // console.log(roomId);
         const room = await Room.findOne({ roomId });
-        // console.log(room);
-        // console.log(room.status);
+
         if (!room) {
             return res.status(401).json({ msg: "room doesn't exist" });
         }
@@ -78,9 +77,12 @@ async function joinroom(req, res) {
         if (room.players.length == room.maxPlayers) {
             return res.status(400).json({ msg: "room is full" });
         }
-        if (room.players.includes(userId)) {
-            return res.status(400).json({ msg: "You are already in this room" });
+
+        if (room.players.find(player => player.userId.toString() === userId)) {
+            // console.log(room.players);
+            return res.status(200).json({ msg: "successfully join!", room, success: true })
         }
+
         room.players.push({
             userId: req.userid,
             username: user.username,
@@ -95,5 +97,7 @@ async function joinroom(req, res) {
     }
 
 }
+
+
 
 module.exports = { createroom, joinroom, getRooms, getRoom, joinroom }
