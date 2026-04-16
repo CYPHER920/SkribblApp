@@ -26,7 +26,7 @@ function App() {
         <Route path='/dashboard' element={<DashBoard />} />
         <Route path='/profile' element={<Profile />} />
         <Route path='/room/:id' element={<Room />} />
-        <Route path='/game' element={<Gamepage />} />
+        <Route path='/game/:id' element={<Gamepage />} />
       </Routes >
 
     </BrowserRouter>

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Player from "./Player";
 import axios from "axios";
 import socket from "./Socket";
-
+import NavBar from "./NavBar";
 const Room = () => {
   const { id } = useParams();
   const [players, setPlayers] = useState([]);
@@ -72,6 +72,7 @@ const Room = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 flex flex-col items-center p-12 select-none">
+      <NavBar />
       <div className="mb-12 text-center mt-10">
         <h2 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 drop-shadow-sm mb-3">
           Lobby <span className="text-slate-300">#{id}</span>
@@ -102,7 +103,7 @@ const Room = () => {
         <button
           disabled={!allReady}
           onClick={() => {
-            navigate('/game');
+            navigate(`/game/${id}`);
             // alert("Game Starting!")
           }}
           className={`px-12 py-4 text-xl font-black tracking-widest uppercase rounded-2xl transition-all duration-300 shadow-2xl

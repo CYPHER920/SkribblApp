@@ -11,6 +11,15 @@ module.exports = (io) => {
         socket.on('join-room', async ({ username, roomid }) => {
 
             socket.join(roomid);
+            const room = await Room.findOne({ roomId: roomid });
+            if (room) {
+                room.players.map((player) => {
+                    if (player.username === username) {
+                        player.socketId = socket.id;
+                    }
+                })
+                await room.save();
+            }
             socket.broadcast.to(roomid).emit('user-connected', { username });
 
         });
@@ -59,6 +68,14 @@ module.exports = (io) => {
             }
             socket.broadcast.to(id).emit('player-left', { players });
         })
+
+        ////////////////////////Chat/////////////////////////
+        socket.on('chats', ({ username, chatText, id }) => {
+
+            socket.to(id).emit('chats', { username, chatText });
+            console.log(chatText);
+        })
+
     });
 
 }
