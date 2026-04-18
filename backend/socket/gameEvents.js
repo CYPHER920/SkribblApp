@@ -1,11 +1,9 @@
-
 const Room = require('../models/Room')
-
 
 module.exports = (io) => {
 
     io.on('connection', (socket) => {
-        console.log("User connected: ", socket.id);
+        // console.log("User connected: ", socket.id);
 
         /// --------------------Join Room------------------------------------------///
         socket.on('join-room', async ({ username, roomid }) => {
@@ -32,19 +30,20 @@ module.exports = (io) => {
                 console.log(`[player-ready] Room found:`, !!room);
                 if (room) {
                     const player = room.players.find(p => p.username === username);
-                    console.log(`[player-ready] Player found inside room:`, !!player);
+                    // console.log(`[player-ready] Player found inside room:`, !!player);
                     if (player) {
                         player.isReady = isReady;
                         // Mark modified explicitly just in case Mongoose subdocument tracking is failing
                         room.markModified('players');
                         await room.save();
-                        console.log(`[player-ready] Saved to DB. Broadcasting player-ready-changed...`);
+                        // console.log(`[player-ready] Saved to DB. Broadcasting player-ready-changed...`);
                         socket.broadcast.to(roomid).emit('player-ready-changed', { username, isReady });
                     }
                 }
             } catch (e) {
                 console.error("[player-ready] Error:", e);
             }
+
         });
 
         //////////////////// Leave - Room ///////////////////
@@ -68,6 +67,22 @@ module.exports = (io) => {
             }
             socket.broadcast.to(id).emit('player-left', { players });
         })
+
+
+        //////////////////////////GAME////////////////////////
+        socket.on('start-game', ({ id }) => {
+
+            socket.to(id).emit('game-started');
+
+        })
+
+        socket.on('gameinfo', async ({ id }) => {
+            const room = await axios.get('http//:localhost:4000/api/v1/getroom', {
+                params: { roomid: id },
+                withCredentials: true
+            });
+        })
+
 
         ////////////////////////Chat/////////////////////////
         socket.on('chats', ({ username, chatText, id }) => {

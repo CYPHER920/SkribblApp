@@ -49,7 +49,7 @@ const Chat = ({ id }) => {
                 </div>
             </div>
 
-            {/* Chat Body */}
+            {/* Chat Body */}   
             <div className="flex-1 overflow-y-auto p-5 space-y-4 scroll-smooth">
                 {message.length > 0 ? (
                     message.map(({ username, chatText }, index) => {

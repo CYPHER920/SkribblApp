@@ -9,7 +9,7 @@ async function tokenverify(req, res, next) {
 
         // const authHeader = req.headers.authorization;  logic if using authorization from reqheader
         // const authorization = decodeURIComponent(authHeader); // making the token URL-Decoded-> Bearer%20 remove the unwant to make Bearer
-
+        console.token;
         if (!token || !token.startsWith("Bearer ")) {
             return res.status(401).send({
                 msg: "invalid token!"
