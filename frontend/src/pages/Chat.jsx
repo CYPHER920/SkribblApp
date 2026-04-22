@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react"
 import socket from "./Socket";
 import axios from 'axios';
+import useGameStore from "./Zustand";
 const Chat = ({ id }) => {
     const [message, setMessage] = useState([]);
     const [chatText, setChatText] = useState("");
     const [user, setUser] = useState("");
-
+    const word = useGameStore((state) => state.word);
     useEffect(() => {
         const userdata = async () => {
             /// gettig user data
@@ -49,7 +50,7 @@ const Chat = ({ id }) => {
                 </div>
             </div>
 
-            {/* Chat Body */}   
+            {/* Chat Body */}
             <div className="flex-1 overflow-y-auto p-5 space-y-4 scroll-smooth">
                 {message.length > 0 ? (
                     message.map(({ username, chatText }, index) => {
@@ -59,11 +60,10 @@ const Chat = ({ id }) => {
                                 <span className={`text-[9px] font-black tracking-widest uppercase mb-1.5 ${isMe ? 'text-pink-400 mr-1' : 'text-indigo-400 ml-1'}`}>
                                     {username}
                                 </span>
-                                <div className={`px-4 py-3 rounded-2xl max-w-[85%] break-words shadow-md text-sm font-semibold leading-relaxed border ${
-                                    isMe 
-                                      ? 'bg-gradient-to-br from-pink-500 to-rose-500 text-white border-pink-400/50 rounded-tr-sm shadow-pink-500/20' 
-                                      : 'bg-slate-800 text-slate-200 border-slate-700 rounded-tl-sm shadow-black/20'
-                                }`}>
+                                <div className={`px-4 py-3 rounded-2xl max-w-[85%] break-words shadow-md text-sm font-semibold leading-relaxed border ${isMe
+                                    ? 'bg-gradient-to-br from-pink-500 to-rose-500 text-white border-pink-400/50 rounded-tr-sm shadow-pink-500/20'
+                                    : 'bg-slate-800 text-slate-200 border-slate-700 rounded-tl-sm shadow-black/20'
+                                    }`}>
                                     {chatText}
                                 </div>
                             </div>
@@ -80,27 +80,33 @@ const Chat = ({ id }) => {
             {/* Input Area */}
             <div className="p-4 bg-slate-900/40 border-t border-white/10 shrink-0">
                 <div className="flex bg-slate-800/80 rounded-xl border border-slate-700 focus-within:border-pink-500 focus-within:ring-2 focus-within:ring-pink-500/20 transition-all p-1 shadow-inner">
-                    <input 
-                        onChange={(e) => setChatText(e.target.value)} 
-                        value={chatText} 
-                        type="text" 
+                    <input
+                        onChange={(e) => setChatText(e.target.value)}
+                        value={chatText}
+                        type="text"
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && chatText.trim().length > 0) {
+                                const tempChat = chatText;
+                                const check = word.toLowerCase() === tempChat.toLowerCase();
+                                if (check) {
+                                    // setChatText("${user} Guessed the word ");
+                                    console.log(chatText);
+                                }
                                 setMessage([...message, { username: user, chatText }]);
-                                socket.emit('chats', { username: user, chatText, id });
+                                socket.emit('chats', { username: user, chatText, id, check });
                                 setChatText("");
                             }
                         }}
                         className="flex-1 bg-transparent px-4 py-2.5 text-sm font-medium text-white focus:outline-none placeholder:text-slate-500"
-                        placeholder="Type to guess or chat..." 
+                        placeholder="Type to guess or chat..."
                     />
-                    <button 
+                    <button
                         onClick={() => {
                             if (chatText.trim().length === 0) return;
                             setMessage([...message, { username: user, chatText }]);
                             socket.emit('chats', { username: user, chatText, id });
                             setChatText("");
-                        }} 
+                        }}
                         className="cursor-pointer bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white px-5 py-2.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all shadow-lg hover:shadow-pink-500/40"
                     >
                         Send

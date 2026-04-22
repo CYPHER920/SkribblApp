@@ -15,7 +15,18 @@ const DashBoard = () => {
     if (!roomid) return alert("Please enter a room code!");
     try {
       setLoading(true);
+      const roomState = await axios.get('http://localhost:4000/api/v1/getroom', { params: { roomid }, withCredentials: true });
+
+      if (roomState.data.room.players.length >= roomState.data.room.maxPlayers) {
+        return alert('Room is Full!');
+      }
+
+      if (roomState.data.room.status === 'playing') {
+
+        return alert('Game started sorry!');
+      }
       const response = await axios.post('http://localhost:4000/api/v1/joinroom', { roomid }, { withCredentials: true });
+
       if (response.data.success) navigate(`/room/${roomid}`);
     } catch (err) {
       alert(err.response?.data?.message || "Invalid Room Code!");
@@ -31,7 +42,8 @@ const DashBoard = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post('http://localhost:4000/api/v1/createroom', { rounds, players }, { withCredentials: true });
+
+      const response = await axios.post('http://localhost:4000/api/v1/createroom', { maxRounds: parseInt(rounds), maxPlayers: parseInt(players) }, { withCredentials: true });
       if (response.data.success) navigate(`/room/${response.data.roomId}`);
     } catch (err) {
       alert("Failed to create room.");

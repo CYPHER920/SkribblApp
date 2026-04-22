@@ -57,13 +57,13 @@ const Room = () => {
     socket.on('user-connected', handleUserConnected);
     socket.on('player-ready-changed', handlePlayerReadyChanged);
     socket.on('player-left', handlePlayerLeft)
-    socket.on('game-started', handleGameStart);
+    socket.on('page-loaded', handleGameStart);
     // Cleanup listeners
     return () => {
       socket.off('user-connected', handleUserConnected);
       socket.off('player-ready-changed', handlePlayerReadyChanged);
       socket.off('player-left', handlePlayerLeft);
-      socket.off('game-started', handleGameStart);
+      socket.off('page-loaded', handleGameStart);
     };
   }, [id]);
 
@@ -118,7 +118,7 @@ const Room = () => {
           <button
             disabled={!allReady}
             onClick={() => {
-              socket.emit('start-game', { id });
+              socket.emit('load-gamepage', { id });
               navigate(`/game/${id}`);
             }}
             className={`px-12 py-4 text-sm md:text-lg font-black tracking-widest uppercase rounded-xl transition-all duration-300 shadow-2xl

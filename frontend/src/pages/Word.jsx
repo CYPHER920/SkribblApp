@@ -1,15 +1,13 @@
-import { useState } from "react";
+import useGameStore from "./Zustand";
 
 const Word = () => {
-    const []=useState(false);
-    const Words = ["Apple", "Car", "Ice", "King", "Mango", "Bike", "Orange", "Table"];
-    const idx = Math.floor((Math.random() * Words.length));
+    const word = useGameStore((state) => state.word);
 
     return (
-       <div>
-        {
-            <h1>{Words[idx]}</h1>
-        }
+        <div>
+
+            <h1>{word}</h1>
+
         </div>
     );
 };

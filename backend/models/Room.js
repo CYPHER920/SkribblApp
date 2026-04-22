@@ -7,7 +7,8 @@ const PlayerSchema = new mongoose.Schema({
     socketId: { type: String, required: true },
     isHost: { type: Boolean, default: false },
     hasGuessed: { type: Boolean, default: false },
-    isReady: { type: Boolean, default: false }
+    isReady: { type: Boolean, default: false },
+    score: { type: Number, default: 0 }
 });
 
 const RoomSchema = new mongoose.Schema({
@@ -20,7 +21,7 @@ const RoomSchema = new mongoose.Schema({
     round: { type: Number, default: 1 },
     maxRounds: { type: Number, default: 3 },
     timeLeft: { type: Number, default: 80 },
-    maxPlayers: { type: Number, default: 8 },
+    maxPlayers: { type: Number, default: 5 },
 }, { timestamps: true });
 
 const Room = mongoose.model('Room', RoomSchema);

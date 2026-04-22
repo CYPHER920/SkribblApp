@@ -1,5 +1,9 @@
 const Room = require('../models/Room')
 
+const Words = ["Apple", "Car", "Boat", "Mountain", "River", "Phone", "Horse"];
+
+const timers = {};
+
 module.exports = (io) => {
 
     io.on('connection', (socket) => {
@@ -27,7 +31,7 @@ module.exports = (io) => {
             console.log(`[player-ready] Received from ${username} for room ${roomid}. State: ${isReady}`);
             try {
                 const room = await Room.findOne({ roomId: roomid });
-                console.log(`[player-ready] Room found:`, !!room);
+                // console.log(`[player-ready] Room found:`, !!room);
                 if (room) {
                     const player = room.players.find(p => p.username === username);
                     // console.log(`[player-ready] Player found inside room:`, !!player);
@@ -70,18 +74,68 @@ module.exports = (io) => {
 
 
         //////////////////////////GAME////////////////////////
-        socket.on('start-game', ({ id }) => {
+        socket.on('load-gamepage', ({ id }) => {
 
-            socket.to(id).emit('game-started');
+            socket.to(id).emit('page-loaded');
 
         })
-
-        socket.on('gameinfo', async ({ id }) => {
-            const room = await axios.get('http//:localhost:4000/api/v1/getroom', {
-                params: { roomid: id },
-                withCredentials: true
-            });
+        socket.on('start-game', async ({ id }) => {
+            const room = await Room.findOne({ roomId: id });
+            if (!room) {
+                console.log("room doesn't exists");
+                return;
+            }
+            room.status = 'playing';
+            await room.save();
+            runGameLoop(id); // calling game loop function
         })
+        async function runGameLoop(id) {
+            const room = await Room.findOne({ roomId: id });
+            const maxRounds = room.maxRounds || 3;
+            const timePerTurn = 60; // 60 seconds
+            for (let currentRound = 1; currentRound <= maxRounds; currentRound++) {
+                io.to(id).emit('setround', { round: currentRound });
+                for (let i = 0; i < room.players.length; i++) {
+                    const currentPlayer = room.players[i];
+                    const idx = Math.floor((Math.random() * 10) % Words.length);
+                    const word = Words[idx];
+                    room.currentWord = word;
+                    await room.save();
+                    io.to(id).emit('data', { word, player: currentPlayer });
+                    let timeLeft = timePerTurn;
+                    await new Promise((resolve) => {
+                        if (timers[id]) {
+                            clearInterval(timers[id]);
+                        }
+                        timers[id] = setInterval(() => {
+                            timeLeft--;
+                            io.to(id).emit('settime', { time: timeLeft });
+                            if (timeLeft === 0) {
+                                clearInterval(timers[id]);
+                                io.to(id).emit('timeup', { player: currentPlayer });
+                                resolve();
+                            }
+                        }, 1000)
+                    });
+
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                }
+            }
+            // Game is completely finished
+            io.to(id).emit('game-over');
+            room.status = 'ended';
+            await room.save();
+        }
+
+
+
+        ////////////////////////Chat/////////////////////////
+        socket.on('chats', ({ username, chatText, id }) => {
+
+            socket.to(id).emit('chats', { username, chatText });
+            console.log(chatText);
+        })
+
 
 
         ////////////////////////Chat/////////////////////////

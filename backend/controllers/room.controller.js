@@ -4,13 +4,13 @@ const { nanoid } = require('nanoid')
 const User = require('../models/User')
 async function createroom(req, res) {
 
-    const { rounds, players } = req.body;
-    console.log(req.userid);
+    const { maxRounds, maxPlayers } = req.body;
+    // console.log(req.userid);
 
     const user = await User.findById(req.userid);
-    console.log(user.username);
+
     const room = await Room.create({
-        host: req.userid, maxRounds: rounds, maxPlayers: players, roomId: nanoid(5),
+        host: req.userid, maxRounds, maxPlayers, roomId: nanoid(5),
         players: [{
             userId: req.userid,
             username: user.username,
@@ -18,6 +18,7 @@ async function createroom(req, res) {
             isHost: true
         }]
     })
+
     res.status(200).json({
         message: 'Room created successfully',
         roomId: room.roomId,
@@ -41,7 +42,7 @@ async function getRooms(req, res) {
 async function getRoom(req, res) {
     try {
         const id = req.query.roomid;
-        console.log(id)
+        // console.log(id)
         const room = await Room.findOne({ roomId: id });
 
         if (!room) {

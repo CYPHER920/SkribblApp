@@ -24,12 +24,13 @@ const validateUser = (schema) => (req, res, next) => {
 const validateRoom = (schema) => (req, res, next) => {
 
     try {
+        // console.log(req.body);
         const result = schema.safeParse(req.body);
+        // console.log(req.body);
         if (!result.success) {
             console.log("Zod Error Details:", result.error.format());
             return res.status(401).json({ msg: "invalid room details" })
         }
-        req.body = result.data;
         next();
     }
     catch (e) {
