@@ -5,16 +5,18 @@ import Canvas from './Canvas'
 import Word from './Word'
 import PlayingPlayers from './PlayingPlayers'
 import { useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import socket from './Socket'
 import useGameStore from './Zustand'
 const GamePage = () => {
     const { id } = useParams();
-    // const [word, setWord] = useState("");
+
     const setWord = useGameStore((state) => state.setWord);
-    const [currentRound, setCurrentRound] = useState(0);
-    const [currentDrawer, setCurrentDrawer] = useState("");
-    const [time, setTimer] = useState();
+    const setTime = useGameStore((state) => state.setTime);
+    const time = useGameStore((state) => state.time);
+    const setRound = useGameStore((state) => state.setRound);
+    const currentRound = useGameStore((state) => state.round);
+    const currentDrawer = useRef("");
     useEffect(() => {
 
         const gameStart = () => {
@@ -23,18 +25,18 @@ const GamePage = () => {
         gameStart();
 
         const settingRound = ({ round }) => {
-            setCurrentRound(round);
+            setRound(round);
         }
         const settingData = ({ word, player }) => {
             setWord(word);
-            setCurrentDrawer(player.username);
+            currentDrawer.current = player.username;
         }
 
         const settingTimer = ({ time }) => {
-            setTimer(time);
+            setTime(time);
         }
         const timeup = ({ player }) => {
-            if (player.username === currentDrawer) alert("Time is up!");
+            if (player.username === currentDrawer.current) alert("Time is up!");
         }
         const gameOver = () => {
             alert("Game Over!");
@@ -61,7 +63,8 @@ const GamePage = () => {
         <div>
             <h1> Timer: {time}</h1>
             <h2> Round: {currentRound}</h2>
-            <h2> Drawer: {currentDrawer}</h2>
+
+            <h2> Drawer: {currentDrawer.current}</h2>
         </div>
         <PlayingPlayers id={id} />
         <Word />

@@ -92,8 +92,9 @@ module.exports = (io) => {
         async function runGameLoop(id) {
             const room = await Room.findOne({ roomId: id });
             const maxRounds = room.maxRounds || 3;
-            const timePerTurn = 60; // 60 seconds
+            const timePerTurn = 15; // 60 seconds
             for (let currentRound = 1; currentRound <= maxRounds; currentRound++) {
+                // console.log("backend: ", currentRound);
                 io.to(id).emit('setround', { round: currentRound });
                 for (let i = 0; i < room.players.length; i++) {
                     const currentPlayer = room.players[i];
@@ -126,24 +127,58 @@ module.exports = (io) => {
             room.status = 'ended';
             await room.save();
         }
+        ////////////////////////Word Guessed Check//////////////////
 
 
+        socket.on('wordguesscheck', async ({ id, username, chatText, time }) => {
+            const room = await Room.findOne({ roomId: id });
+            const player = room.players.find((p) => p.username === username);
+            const word = room.currentWord;
+            const currWord = word.toLowerCase();
+            const chatWord = chatText.toLowerCase();
+            console.log(chatWord, currWord);
+            if (chatWord === currWord) {
+                console.log("scoer", player.score);
+                if (time >= 7) {
+                    let curr = player.score;
+                    curr = curr + 10;
+                    player.score = curr;
+                    console.log(player.score);
+                }
+                else if (time >= 4 && time < 7) {
+                    let curr = player.score;
+                    curr = curr + 5;
+                    player.score = curr;
+                }
+                else if (time >= 1 && time < 4) {
+                    let curr = player.score;
+                    curr = curr + 2;
+                    player.score = curr;
+                }
+                await room.save();
 
-        ////////////////////////Chat/////////////////////////
-        socket.on('chats', ({ username, chatText, id }) => {
-
-            socket.to(id).emit('chats', { username, chatText });
-            console.log(chatText);
+                io.to(id).emit('word-guessed', { username });
+            }
+            else {
+                io.to(id).emit('chats', { username, chatText });
+            }
         })
 
-
-
         ////////////////////////Chat/////////////////////////
-        socket.on('chats', ({ username, chatText, id }) => {
+        // socket.on('chats', ({ username, chatText, id }) => {
 
-            socket.to(id).emit('chats', { username, chatText });
-            console.log(chatText);
-        })
+        //     socket.to(id).emit('chats', { username, chatText });
+        //     console.log(chatText);
+        // })
+
+
+
+        // ////////////////////////Chat/////////////////////////
+        // socket.on('chats', ({ username, chatText, id }) => {
+
+        //     socket.to(id).emit('chats', { username, chatText });
+        //     console.log(chatText);
+        // })
 
     });
 

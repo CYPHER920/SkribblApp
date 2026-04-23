@@ -7,6 +7,7 @@ const Chat = ({ id }) => {
     const [chatText, setChatText] = useState("");
     const [user, setUser] = useState("");
     const word = useGameStore((state) => state.word);
+    const time = useGameStore((state) => state.time);
     useEffect(() => {
         const userdata = async () => {
             /// gettig user data
@@ -23,17 +24,22 @@ const Chat = ({ id }) => {
         /// chat update listener
 
 
-        const handleChat = ({ username, chatText }) => {
-            console.log("hi");
-            setMessage((prev) => [...prev, { username, chatText }]);
+        const handleChat = ({ username }) => {
+
+            setMessage((prev) => [...prev, { username, chatText: "Guessed the word" }]);
         };
 
+        const settingChats = ({ username, chatText }) => {
+            setMessage((prev) => [...prev, { username, chatText }]);
+        }
         // Listen for the event
-        socket.on('chats', handleChat);
+        socket.on('word-guessed', handleChat);
+        socket.on('chats', settingChats);
 
         // CLEANUP: Remove the listener when the component unmounts
         return () => {
-            socket.off('chats', handleChat);
+            socket.off('word-guessed', handleChat);
+            socket.off('chats', settingChats)
         };
 
 
@@ -86,14 +92,10 @@ const Chat = ({ id }) => {
                         type="text"
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && chatText.trim().length > 0) {
-                                const tempChat = chatText;
-                                const check = word.toLowerCase() === tempChat.toLowerCase();
-                                if (check) {
-                                    // setChatText("${user} Guessed the word ");
-                                    console.log(chatText);
-                                }
-                                setMessage([...message, { username: user, chatText }]);
-                                socket.emit('chats', { username: user, chatText, id, check });
+
+                                socket.emit('wordguesscheck', ({ id, username: user, chatText }));
+                                // setMessage([...message, { username: user, chatText }]);
+                                // socket.emit('chats', { username: user, chatText, id });
                                 setChatText("");
                             }
                         }}
@@ -103,8 +105,9 @@ const Chat = ({ id }) => {
                     <button
                         onClick={() => {
                             if (chatText.trim().length === 0) return;
-                            setMessage([...message, { username: user, chatText }]);
-                            socket.emit('chats', { username: user, chatText, id });
+                            // setMessage([...message, { username: user, chatText }]);
+                            // socket.emit('chats', { username: user, chatText, id });
+                            socket.emit('wordguesscheck', ({ id, username: user, chatText, time }));
                             setChatText("");
                         }}
                         className="cursor-pointer bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white px-5 py-2.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all shadow-lg hover:shadow-pink-500/40"
