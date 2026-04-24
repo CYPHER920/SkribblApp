@@ -6,6 +6,7 @@ import DashBoard from './pages/DashBoard';
 import Profile from './pages/Profile'
 import Room from './pages/Room'
 import Gamepage from './pages/GamePage'
+import FinalResult from './pages/FinalResult';
 function App() {
 
   // useEffect(()=>{
@@ -27,6 +28,7 @@ function App() {
         <Route path='/profile' element={<Profile />} />
         <Route path='/room/:id' element={<Room />} />
         <Route path='/game/:id' element={<Gamepage />} />
+        <Route path='/final-result' element={<FinalResult />} />
       </Routes >
 
     </BrowserRouter>

@@ -3,17 +3,25 @@ import React, { useRef, useState, useEffect } from 'react';
 const Canvas = () => {
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
-  
+  const containerRef = useRef(null);
+
   const [isDrawing, setIsDrawing] = useState(false);
   const [isEraser, setIsEraser] = useState(false);
-  const [color, setColor] = useState("black"); // Default color is black
+  const [color, setColor] = useState("#000000"); // Default color
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    canvas.width = window.innerWidth * 2;
-    canvas.height = window.innerHeight * 2;
-    canvas.style.width = `${window.innerWidth}px`;
-    canvas.style.height = `${window.innerHeight}px`;
+    const container = containerRef.current;
+
+    // Set a responsive width based on container, but a much smaller fixed height
+    // to prevent it from going too far down the screen.
+    const width = container.clientWidth || 600;
+    const height = 400; // Smaller height
+
+    canvas.width = width * 2;
+    canvas.height = height * 2;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
 
     const context = canvas.getContext("2d");
     context.scale(2, 2);
@@ -64,73 +72,55 @@ const Canvas = () => {
     setIsEraser(false);
   };
 
-  const colors = ["black", "red", "green", "blue", "yellow"];
+  const colors = ["#000000", "#EF4444", "#22C55E", "#3B82F6", "#EAB308", "#A855F7", "#EC4899"];
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '20px', fontFamily: 'sans-serif' }}>
-      <div style={{ marginBottom: '15px', display: 'flex', justifyContent: 'center', gap: '10px', alignItems: 'center' }}>
-        
-        {/* Color Palette */}
-        {colors.map((c) => (
-          <button
-            key={c}
-            onClick={() => selectColor(c)}
-            style={{
-              backgroundColor: c,
-              width: '30px',
-              height: '30px',
-              borderRadius: '50%',
-              border: color === c && !isEraser ? '3px solid #333' : '1px solid #ccc',
-              cursor: 'pointer'
-            }}
-            title={c}
-          />
-        ))}
+    <div ref={containerRef} className="w-full h-full flex flex-col items-center justify-center p-2">
+      {/* Toolbar */}
+      <div className="mb-4 flex flex-wrap justify-center items-center gap-3 bg-slate-800/50 backdrop-blur-md p-3 rounded-2xl shadow-lg border border-white/10">
 
-        <div style={{ width: '2px', height: '30px', background: '#ccc', margin: '0 10px' }} />
+        {/* Color Palette */}
+        <div className="flex gap-2 items-center">
+          {colors.map((c) => (
+            <button
+              key={c}
+              onClick={() => selectColor(c)}
+              className={`w-8 h-8 rounded-full shadow-sm transition-transform hover:scale-110 ${color === c && !isEraser ? 'ring-4 ring-pink-500/50 scale-110' : 'border border-white/20'}`}
+              style={{ backgroundColor: c }}
+              title="Select Color"
+            />
+          ))}
+        </div>
+
+        <div className="w-px h-8 bg-white/20 mx-2" />
 
         {/* Tools */}
-        <button 
-          onClick={() => setIsEraser(true)} 
-          style={{ 
-            padding: '8px 12px',
-            backgroundColor: isEraser ? '#ddd' : '#fff',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
+        <button
+          onClick={() => setIsEraser(true)}
+          className={`px-4 py-2 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${isEraser ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/30' : 'bg-slate-700 text-slate-300 hover:bg-slate-600 border border-white/10'}`}
         >
           🧽 Eraser
         </button>
 
-        <button 
-          onClick={clearAll} 
-          style={{ 
-            padding: '8px 12px',
-            backgroundColor: '#fff',
-            color: 'red',
-            border: '1px solid red',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
+        <button
+          onClick={clearAll}
+          className="px-4 py-2 rounded-xl font-bold text-sm bg-slate-700 text-rose-400 border border-white/10 hover:bg-slate-600 hover:text-rose-300 shadow-sm transition-all flex items-center gap-2"
         >
-          🗑️ Clear All
+          🗑️ Clear
         </button>
       </div>
 
-      <canvas
-        onMouseDown={startDrawing}
-        onMouseUp={finishDrawing}
-        onMouseMove={draw}
-        onMouseLeave={finishDrawing} // Stop drawing if mouse leaves canvas
-        ref={canvasRef}
-        style={{ 
-          border: "2px solid #333", 
-          cursor: isEraser ? "cell" : "crosshair",
-          backgroundColor: "white",
-          boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-        }}
-      />
+      {/* Canvas Area */}
+      <div className="rounded-[1.5rem] overflow-hidden shadow-2xl border-4 border-white/10 bg-white">
+        <canvas
+          onMouseDown={startDrawing}
+          onMouseUp={finishDrawing}
+          onMouseMove={draw}
+          onMouseLeave={finishDrawing}
+          ref={canvasRef}
+          className={`touch-none ${isEraser ? "cursor-cell" : "cursor-crosshair"}`}
+        />
+      </div>
     </div>
   );
 };

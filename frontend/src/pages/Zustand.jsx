@@ -4,6 +4,14 @@ const useGameStore = create((set) => ({
     word: "???",
     time: 0,
     round: 0,
+    winner: "",
+    winnerScore: 0,
+    setWinnerScore: (newScore) => {
+        set({ winnerScore: newScore })
+    },
+    setWinner: (newWinner) => {
+        set({ winner: newWinner })
+    },
     setWord: (newWord) => {
         set({ word: newWord });
     },

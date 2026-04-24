@@ -2,11 +2,13 @@ import { useEffect, useState } from "react"
 import socket from "./Socket";
 import axios from 'axios';
 import useGameStore from "./Zustand";
-const Chat = ({ id }) => {
+import { useParams } from 'react-router-dom';
+
+const Chat = () => {
+    const { id } = useParams();
     const [message, setMessage] = useState([]);
     const [chatText, setChatText] = useState("");
     const [user, setUser] = useState("");
-    const word = useGameStore((state) => state.word);
     const time = useGameStore((state) => state.time);
     useEffect(() => {
         const userdata = async () => {
@@ -93,7 +95,7 @@ const Chat = ({ id }) => {
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && chatText.trim().length > 0) {
 
-                                socket.emit('wordguesscheck', ({ id, username: user, chatText }));
+                                socket.emit('wordguesscheck', ({ id, username: user, chatText, time }));
                                 // setMessage([...message, { username: user, chatText }]);
                                 // socket.emit('chats', { username: user, chatText, id });
                                 setChatText("");
@@ -107,6 +109,8 @@ const Chat = ({ id }) => {
                             if (chatText.trim().length === 0) return;
                             // setMessage([...message, { username: user, chatText }]);
                             // socket.emit('chats', { username: user, chatText, id });
+
+                            console.log("time is : ", time);
                             socket.emit('wordguesscheck', ({ id, username: user, chatText, time }));
                             setChatText("");
                         }}
