@@ -92,7 +92,7 @@ module.exports = (io) => {
         async function runGameLoop(id) {
             const room = await Room.findOne({ roomId: id });
             const maxRounds = room.maxRounds || 3;
-            const timePerTurn = 7; // 60 seconds
+            const timePerTurn = 60; // 60 seconds
             for (let currentRound = 1; currentRound <= maxRounds; currentRound++) {
                 // console.log("backend: ", currentRound);
                 io.to(id).emit('setround', { round: currentRound });
@@ -139,20 +139,20 @@ module.exports = (io) => {
             const chatWord = chatText.toLowerCase();
 
             if (chatWord === currWord) {
-                if (time >= 7) {
+                if (time >= 45) {
                     let curr = player.score;
                     curr = curr + 10;
                     player.score = curr;
 
 
                 }
-                else if (time >= 4 && time < 7) {
+                else if (time >= 25 && time < 40) {
                     let curr = player.score;
                     curr = curr + 5;
                     player.score = curr;
 
                 }
-                else if (time >= 1 && time < 4) {
+                else if (time >= 2 && time <= 24) {
                     let curr = player.score;
                     curr = curr + 2;
                     player.score = curr;
@@ -176,12 +176,22 @@ module.exports = (io) => {
 
 
 
-        // ////////////////////////Chat/////////////////////////
-        // socket.on('chats', ({ username, chatText, id }) => {
+        ////////////////////////Drawing Events/////////////////////////
+        socket.on('start-drawing', ({ offsetX, offsetY, color, isEraser, id }) => {
+            socket.to(id).emit('start-drawing', { offsetX, offsetY, color, isEraser });
+        });
 
-        //     socket.to(id).emit('chats', { username, chatText });
-        //     console.log(chatText);
-        // })
+        socket.on('drawing', ({ offsetX, offsetY, id }) => {
+            socket.to(id).emit('drawing', { offsetX, offsetY });
+        });
+
+        socket.on('finish-drawing', ({ id }) => {
+            socket.to(id).emit('finish-drawing');
+        });
+
+        socket.on('clear-canvas', ({ id }) => {
+            socket.to(id).emit('clear-canvas');
+        });
 
     });
 

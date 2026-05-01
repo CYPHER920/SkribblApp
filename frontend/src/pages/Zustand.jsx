@@ -6,6 +6,8 @@ const useGameStore = create((set) => ({
     round: 0,
     winner: "",
     winnerScore: 0,
+    currentDrawer: "",
+    currentUser: "",
     setWinnerScore: (newScore) => {
         set({ winnerScore: newScore })
     },
@@ -20,6 +22,12 @@ const useGameStore = create((set) => ({
     },
     setRound: (newRound) => {
         set({ round: newRound })
+    },
+    setCurrentDrawer: (newDrawer) => {
+        set({ currentDrawer: newDrawer })
+    },
+    setCurrentUser: (newUser) => {
+        set({ currentUser: newUser })
     }
 
 }));

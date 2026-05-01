@@ -18,15 +18,17 @@ const GamePage = () => {
     const time = useGameStore((state) => state.time);
     const setRound = useGameStore((state) => state.setRound);
     const currentRound = useGameStore((state) => state.round);
-    const currentDrawer = useRef("");
-    const currentUser = useRef("");
+    const currentDrawer = useGameStore((state) => state.currentDrawer);
+    const setCurrentDrawer = useGameStore((state) => state.setCurrentDrawer);
+    const currentUser = useGameStore((state) => state.currentUser);
+    const setCurrentUser = useGameStore((state) => state.setCurrentUser);
     const navigate = useNavigate();
     useEffect(() => {
 
         const fetchUser = async () => {
             try {
                 const res = await axios.get('http://localhost:4000/api/v1/userinfo', { withCredentials: true });
-                currentUser.current = res.data.username;
+                setCurrentUser(res.data.username);
             } catch (err) {
                 console.error("Error fetching user info:", err);
             }
@@ -42,8 +44,8 @@ const GamePage = () => {
             setRound(round);
         }
         const settingData = ({ word, player }) => {
-            currentDrawer.current = player.username;
-            const isDrawer = player.username === currentUser.current;
+            setCurrentDrawer(player.username);
+            const isDrawer = player.username === currentUser;
             const upperWord = word.toUpperCase();
             if (isDrawer) {
                 setWord(upperWord.split('').join(' '));
@@ -108,7 +110,7 @@ const GamePage = () => {
                         <div className="flex items-center gap-4">
                             <div className="flex flex-col items-end justify-center">
                                 <div className="text-[10px] text-slate-400 uppercase tracking-widest font-black mb-1">Drawing Now</div>
-                                <div className="font-bold text-emerald-400 text-sm bg-emerald-400/10 px-3 py-1 rounded-full border border-emerald-400/20">{currentDrawer.current || "Waiting..."}</div>
+                                <div className="font-bold text-emerald-400 text-sm bg-emerald-400/10 px-3 py-1 rounded-full border border-emerald-400/20">{currentDrawer || "Waiting..."}</div>
                             </div>
                             <div className="flex items-center gap-2 bg-gradient-to-br from-rose-500/20 to-pink-500/20 text-rose-400 px-4 py-2 rounded-xl border border-rose-500/30 shadow-inner">
                                 <span className="text-xl animate-pulse">⏱</span>
