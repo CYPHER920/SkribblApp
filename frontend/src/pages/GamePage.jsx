@@ -45,7 +45,8 @@ const GamePage = () => {
         }
         const settingData = ({ word, player }) => {
             setCurrentDrawer(player.username);
-            const isDrawer = player.username === currentUser;
+            const currentStoreUser = useGameStore.getState().currentUser;
+            const isDrawer = player.username === currentStoreUser;
             const upperWord = word.toUpperCase();
             if (isDrawer) {
                 setWord(upperWord.split('').join(' '));

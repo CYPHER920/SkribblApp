@@ -2,7 +2,7 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User')
 const jwt = require('jsonwebtoken');
-const jwtpassword = process.env.password
+const jwtpassword = process.env.Password;
 /*{Sing Up logic}*/
 
 async function signup(req, res) {

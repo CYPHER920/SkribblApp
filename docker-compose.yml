@@ -1,0 +1,16 @@
+services:
+  backend:
+    build: ./backend
+    image: backendgame # <--- You define the name here
+    env_file:
+      - ./backend/.env
+    ports:
+      - "4000:4000"
+
+  frontend:
+    build: ./frontend
+    image: frontendgame
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
