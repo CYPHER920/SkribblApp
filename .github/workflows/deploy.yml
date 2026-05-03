@@ -28,8 +28,8 @@ jobs:
           context: ./backend
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/backendgame:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/backendgame:${{ github.sha }}
+            ${{ secrets.DOCKER_USERNAME }}/backendgame:latest
+            ${{ secrets.DOCKER_PASSWORD }}/backendgame:${{ github.sha }}
 
       - name: Build and push Frontend
         uses: docker/build-push-action@v5
@@ -37,5 +37,5 @@ jobs:
           context: ./frontend
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/frontendgame:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/frontendgame:${{ github.sha }}
+            ${{ secrets.DOCKER_USERNAME }}/frontendgame:latest
+            ${{ secrets.DOCKER_PASSWORD }}/frontendgame:${{ github.sha }}
