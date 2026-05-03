@@ -28,8 +28,8 @@ async function signup(req, res) {
     const token = "Bearer " + jwt.sign({ id: newUser._id }, jwtpassword);
     res.cookie('token', token, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax'
+        secure: true,
+        sameSite: 'none'
     })
 
     return res.status(200).send({
@@ -63,8 +63,8 @@ async function signin(req, res) {
     // console.log(token);
     res.cookie('token', token, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax'
+        secure: true,
+        sameSite: 'none'
     })
     return res.status(200).send({ msg: "Successfully login" })
 }
@@ -73,8 +73,8 @@ async function signin(req, res) {
 const logout = (req, res) => {
     res.clearCookie('token', {
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
+        secure: true,
+        sameSite: 'none',
         path: '/'
     });
     return res.status(200).send("Logged Out successfully");
