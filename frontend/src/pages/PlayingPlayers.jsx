@@ -28,7 +28,7 @@ const PlayingPlayers = () => {
             }
         };
         const getUser = async () => {
-            const currPlayer = await API.get('/api/v1/userInfo', { withCredentials: true });
+            const currPlayer = await API.get('/api/v1/userinfo', { withCredentials: true });
             setCurrentPlayer(currPlayer.data.username);
         }
         getUser();

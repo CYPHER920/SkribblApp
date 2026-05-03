@@ -8,6 +8,7 @@ const { Server } = require('socket.io')
 const cookieParser = require('cookie-parser');
 const app = express();
 // middleware section
+app.set("trust proxy", 1);
 
 app.use(cors({
     origin: ['http://localhost:5173', 'https://frontendgame-latest.onrender.com'],
