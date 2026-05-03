@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Player from "./Player";
-import axios from "axios";
+import API from '../api';
 import socket from "./Socket";
 import NavBar from "./NavBar";
 const Room = () => {
@@ -12,13 +12,13 @@ const Room = () => {
   useEffect(() => {
     const getInfo = async () => {
       try {
-        const result = await axios.get('http://localhost:4000/api/v1/getroom', {
+        const result = await API.get('/api/v1/getroom', {
           params: { roomid: id },
           withCredentials: true
         });
         setPlayers(result.data.room.players);
 
-        const user = await axios.get('http://localhost:4000/api/v1/userinfo', { withCredentials: true });
+        const user = await API.get('/api/v1/userinfo', { withCredentials: true });
         setCurrentUser(user.data.username);
 
         // We emit roomid, not id, according to the backend listener

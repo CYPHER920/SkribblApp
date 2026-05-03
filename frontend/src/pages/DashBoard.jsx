@@ -1,7 +1,7 @@
 import NavBar from './NavBar';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import axios from 'axios';
+import API from '../api';
 
 const DashBoard = () => {
   const [loading, setLoading] = useState(false);
@@ -15,7 +15,7 @@ const DashBoard = () => {
     if (!roomid) return alert("Please enter a room code!");
     try {
       setLoading(true);
-      const roomState = await axios.get('http://localhost:4000/api/v1/getroom', { params: { roomid }, withCredentials: true });
+      const roomState = await API.get('/api/v1/getroom', { params: { roomid }, withCredentials: true });
 
       if (roomState.data.room.players.length >= roomState.data.room.maxPlayers) {
         return alert('Room is Full!');
@@ -25,7 +25,7 @@ const DashBoard = () => {
 
         return alert('Game started sorry!');
       }
-      const response = await axios.post('http://localhost:4000/api/v1/joinroom', { roomid }, { withCredentials: true });
+      const response = await API.post('/api/v1/joinroom', { roomid }, { withCredentials: true });
 
       if (response.data.success) navigate(`/room/${roomid}`);
     } catch (err) {
@@ -43,7 +43,7 @@ const DashBoard = () => {
     try {
       setLoading(true);
 
-      const response = await axios.post('http://localhost:4000/api/v1/createroom', { maxRounds: parseInt(rounds), maxPlayers: parseInt(players) }, { withCredentials: true });
+      const response = await API.post('/api/v1/createroom', { maxRounds: parseInt(rounds), maxPlayers: parseInt(players) }, { withCredentials: true });
       if (response.data.success) navigate(`/room/${response.data.roomId}`);
     } catch (err) {
       alert("Failed to create room.");

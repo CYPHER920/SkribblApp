@@ -1,5 +1,5 @@
 import Profile from './Profile'
-import axios from 'axios'
+import API from '../api';
 import { useNavigate } from 'react-router-dom';
 
 const NavBar = () => {
@@ -8,8 +8,7 @@ const NavBar = () => {
   const handleLogout = async () => {
     // Logic for logout goes here
     try {
-      await axios.post(
-        'http://localhost:4000/api/v1/logout',
+      await API.post('/api/v1/logout',
         {},
         {
           withCredentials: true

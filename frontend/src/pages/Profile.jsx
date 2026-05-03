@@ -1,4 +1,4 @@
-import axios from 'axios';
+import API from '../api';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 const Profile = () => {
@@ -8,7 +8,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/v1/userinfo', {
+        const response = await API.get('/api/v1/userinfo', {
           withCredentials: true
         });
         

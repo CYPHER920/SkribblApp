@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import socket from "./Socket";
-import axios from 'axios';
+import API from '../api';
 import useGameStore from "./Zustand";
 import { useParams } from 'react-router-dom';
 
@@ -13,7 +13,7 @@ const Chat = () => {
     useEffect(() => {
         const userdata = async () => {
             /// gettig user data
-            const userinfo = await axios.get('http://localhost:4000/api/v1/userinfo', { withCredentials: true });
+            const userinfo = await API.get('/api/v1/userinfo', { withCredentials: true });
             setUser(userinfo.data.username);
 
             // Critical Fix: Explicitly join the room when Chat mounts.

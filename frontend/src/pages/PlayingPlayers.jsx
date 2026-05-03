@@ -1,4 +1,4 @@
-import axios from 'axios';
+import API from '../api';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import socket from './Socket';
@@ -12,7 +12,7 @@ const PlayingPlayers = () => {
     useEffect(() => {
         const getPlayers = async () => {
             try {
-                const result = await axios.get('http://localhost:4000/api/v1/getroom', {
+                const result = await API.get('/api/v1/getroom', {
                     params: { roomid: id },
                     withCredentials: true
                 });
@@ -28,7 +28,7 @@ const PlayingPlayers = () => {
             }
         };
         const getUser = async () => {
-            const currPlayer = await axios.get('http://localhost:4000/api/v1/userInfo', { withCredentials: true });
+            const currPlayer = await API.get('/api/v1/userInfo', { withCredentials: true });
             setCurrentPlayer(currPlayer.data.username);
         }
         getUser();

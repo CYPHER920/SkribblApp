@@ -8,7 +8,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useEffect, useState, useRef } from 'react'
 import socket from './Socket'
 import useGameStore from './Zustand'
-import axios from 'axios'
+import API from '../api';
 
 const GamePage = () => {
     const { id } = useParams();
@@ -27,7 +27,7 @@ const GamePage = () => {
 
         const fetchUser = async () => {
             try {
-                const res = await axios.get('http://localhost:4000/api/v1/userinfo', { withCredentials: true });
+                const res = await API.get('/api/v1/userinfo', { withCredentials: true });
                 setCurrentUser(res.data.username);
             } catch (err) {
                 console.error("Error fetching user info:", err);
