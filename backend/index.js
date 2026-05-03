@@ -10,7 +10,7 @@ const app = express();
 // middleware section
 
 app.use(cors({
-    origin: 'https://frontendgame-latest.onrender.com',
+    origin: ['http://localhost:5173', 'https://frontendgame-latest.onrender.com'],
     credentials: true
 }));
 app.use(express.json());
